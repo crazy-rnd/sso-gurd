@@ -14,18 +14,32 @@ namespace TeamXSecurityClientApp.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpGet]
-        public async Task<IActionResult> LoginAsync([FromBody]AppUser testUser)
+        [HttpPost]
+        public IActionResult Login([FromBody] AppUser user )
         {
+            string token = LoginAsync(user).Result;
+            return Ok(token);
+        }
+        //[HttpGet]
+        public async Task<string> LoginAsync(AppUser testUser)
+        {
+            string finalToken = "";
 
-            var user = new AppUser();
+            //AppUser testUser = new AppUser();
 
-            user.UserName = "Rakib";
-            user.Password = "12345";
+            var validUser = new AppUser();
 
-            if (testUser.UserName == user.UserName && testUser.Password == user.Password)
+            ////user requsted from ui 
+            //testUser.UserName = "Rakib";
+            //testUser.Password = "12345";
+
+            //user saved in database
+            validUser.UserName = "Rakib";
+            validUser.Password = "12345";
+
+            if (testUser.UserName == validUser.UserName && testUser.Password == validUser.Password)
             {
-                string finalToken = "";
+               
                 //// discover endpoints from the metadata by calling Auth server hosted on 5000 port
                 var discover = await DiscoveryClient.GetAsync("http://localhost:5000");
                 if (discover.IsError)
@@ -69,15 +83,12 @@ namespace TeamXSecurityClientApp.Controllers
                     /*return Ok(JArray.Parse(content));*/
                 }
 
-                return Ok(finalToken);
+              
             }
 
-            else
-            {
-                return Unauthorized();
-            }
+            return finalToken;
 
-           
+
         }
     }
 }
